@@ -1,0 +1,87 @@
+body{
+margin:0;
+background:#fff;
+color:#666;
+text-align:center;
+font:"Trebuchet MS",arial,helvetica,clean,sans-serif;
+}
+a{
+color:#69c;
+}
+
+.header,.main,.footer{
+display:block;
+position:relative;
+width:980px;
+margin:auto;
+background:#ccc;
+text-align:center;
+-webkit-box-shadow:2px 2px 4px rgba(102,153,204, 0.3);
+-moz-box-shadow: 2px 2px 4px rgba(102,153,204, 0.3);
+box-shadow: 2px 2px 4px rgba(102,153, 204, 0.3);
+}
+.header{
+margin-top:10px;
+height:140px;
+border-bottom:#69c 2px solid;
+display:-webkit-box;
+display:-moz-box;
+}
+.header .left{
+height:140px;
+}
+.header .right{
+}
+.main{
+display:-webkit-box;
+display:-moz-box;
+}
+.footer{
+height:60px;
+margin-bottom:10px;
+border-top:#69c 2px solid;
+}
+.footer span{
+margin:0 10px;
+}
+.left{
+border-right:#69c 2px solid;
+text-align:right;
+width:140px;
+}
+.right{
+text-align:left;
+width:790px;
+}
+.logo{
+width:110px;
+height:110px;
+margin:15px;
+}
+.summary{
+font-size:20px;
+margin:15px 0;
+}
+.summary div{
+margin:0 15px 15px;
+}
+.summary .name{
+font-size:30px;
+}
+.nav{
+font-size:20px;
+margin:15px 0;
+}
+.nav .index{
+margin:0 15px 15px;
+}
+.content{
+margin:15px 15px;
+}
+.content .section{
+font-size:20px;
+margin-bottom:15px;
+}
+.content .section span{
+}
+
