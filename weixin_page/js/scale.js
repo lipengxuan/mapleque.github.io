@@ -122,6 +122,7 @@
       console.log('start',oldy);
     };
     var move=function(e){
+      e.preventDefault();
       if (!ondrag)return;
       dy=getY(e)-oldy;
       console.log('move',dy);
