@@ -35,12 +35,12 @@
     $cur=$($('.wraper li')[cur]);
     $act=$($('.wraper li')[act]);
     var ischange=false;
-    if (Math.abs(dy)>100){
-      $cur.animate({'top':(dy>0?1:-1)*$cur.height()},300); 
-      $act.animate({'-webkit-transform':'scale(1)'},300);
+    if (Math.abs(dy)>0){
+      $cur.animate({'top':(dy>0?1:-1)*$cur.height()},300,'linear'); 
+      $act.animate({'-webkit-transform':'scale(1)'},300,'linear');
       ischange=true;
     }else{
-      $cur.animate({'-webkit-transform':'scale(1)'},300);
+      $cur.animate({'-webkit-transform':'scale(1)'},300,'linear');
     }
     clear_status_wraper($cur,$act,ischange);
   };
