@@ -113,7 +113,10 @@
     var getY=function(e){
       return support?e.touches[0].pageY:e.pageY;
     };
+    var lock=false;
     var start=function(e){
+      if (lock)return;
+      lock=true;
       ondrag=true;
       oldy=getY(e);
       console.log('start',oldy);
@@ -131,6 +134,7 @@
       ondrag=false;
       console.log('end',dy);
       change_end_wraper(dy,cur,act);
+      setTimeout(function(){lock=false},300);
     };
 
     //add listener
