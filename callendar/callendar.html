@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<meta charset='utf8'>
+<style>
+.main{
+display:block;
+position:relative;
+text-align:center;
+color:#333;
+}
+.header{
+display:block;
+position:relative;
+margin:auto;
+width:800px;
+height:100px;
+background:#ddd;
+line-height:100px;
+font-size:20px;
+}
+.body{
+display:block;
+position:relative;
+margin:auto;
+width:800px;
+height:600px;
+}
+.arr{
+display:block;
+position:relative;
+float:left;
+width:50px;
+height:600px;
+background:#aaa;
+line-height:600px;
+}
+.arr:hover{
+background:#999;
+}
+.pad{
+display:block;
+position:relative;
+float:left;
+width:700px;
+height:600px;
+}
+.day{
+display:block;
+position:relative;
+float:left;
+width:100px;
+height:100px;
+}
+.day-num{
+display:block;
+height:20px;
+width:100px;
+line-height:20px;
+font-size:10px;
+}
+.day-content{
+display:block;
+height:80px;
+width:100px;
+margin:0;
+padding:0;
+font-size:14px;
+}
+.weekday:nth-of-type(2n),.day:nth-of-type(2n-1){
+background:#eee;
+}
+.weekday:nth-of-type(2n-1),.day:nth-of-type(2n){
+background:#ccc;
+}
+.weekday:nth-of-type(7n),.day:nth-of-type(7n){
+color:red;
+}
+.weekday:nth-of-type(7n+1),.day:nth-of-type(7n+1){
+color:red;
+}
+.week{
+display:block;
+position:relative;
+margin:auto;
+text-align:center;
+width:800px;
+height:20px;
+background:#ddd;
+}
+.weekday{
+display:block;
+position:relative;
+margin:auto;
+float:left;
+width:100px;
+height:20px;
+}
+.weekday:first-child{
+margin-left:50px;
+}
+.weekday:last-child{
+margin-right:50px;
+}
+.curday{
+background:#0ff !important;
+}
+
+.edit{
+display:none;
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:800px;
+background:#333;
+opacity:0.7;
+}
+.edit-box{
+display:block;
+position:relative;
+top:100px;
+left:50%;
+margin-left:-200px;
+width:400px;
+height:400px;
+background:#ccc;
+}
+.edit h2{
+width:400px;
+height:50px;
+line-height:50px;
+margin:0;
+padding:0;
+text-align:center;
+font-size:20px;
+}
+.edit textarea{
+display:block;
+width:400px;
+height:350px;
+position:relative;
+float:left;
+padding:0;
+margin:0;
+border:none
+}
+.edit button{
+display:block;
+width:200px;
+height:50px;
+position:relative;
+float:left;
+}
+
+</style>
+
+<div class="main">
+	<div class="header" id="title"></div>
+	<div class="week">
+	  <span class="weekday">日</span>
+	  <span class="weekday">一</span>
+	  <span class="weekday">二</span>
+	  <span class="weekday">三</span>
+	  <span class="weekday">四</span>
+	  <span class="weekday">五</span>
+	  <span class="weekday">六</span>
+	</div>
+	<div class="body">
+	  <div class="arr" id="arr-l"><</div>
+	  <div class="pad" id="content"></div>
+	  <div class="arr" id="arr-r">></div>
+	</div>
+</div>
+<div class="edit" id="edit">
+  <div class="edit-box">
+    <h2 id="edit-title"></h2>
+    <textarea id="edit-content" placeholder="输入你要添加的内容"></textarea>
+    <button id="cancle">取消</button>
+    <button id="submit">确定</button>
+  </div>
+</div>
+<script>
+var monthData={
+  year:2014,//当前年份
+	pre:1,//上个月份
+	cur:2,//当前月分
+	next:3,//下个
+	days:[]//日期数组，长度固定为42
+};
+var todaystr='';
+//生成指定月份数据
+var generalMonth=function(year,month){
+	//获得当前月天数
+	var totalday=0;//1-31
+	var nextfirstday=new Date(year,month,1);
+	monthData.next=nextfirstday.getMonth()+1;
+	nextfirstday.setDate(nextfirstday.getDate()-1)
+	totalday=nextfirstday.getDate();
+  //计算当前月第一天是星期几
+	var firstweeknum=0;//0-6
+	var curfirstday=new Date(year,month-1,1);
+	firstweeknum=curfirstday.getDay();
+	//生成days数据
+	var lastfirstday=new Date(year,month-2,1);
+	monthData.pre=lastfirstday.getMonth()+1;
+	var curdate=0;
+	for (var i=0;i<42;i++){
+	  if (i<firstweeknum||i>totalday){
+	    curdate=0;
+	  }else{
+	    curdate++;
+	  }
+	  monthData.days[i]=curdate;
+	}
+	monthData.cur=month;
+	monthData.year=year;
+	console.log(monthData);
+};
+var buildView=function(){
+  var html=[];
+  for (var i=0;i<42;i++){
+    var datastr=monthData.year+'-'+monthData.cur+'-'+monthData.days[i];
+    var content=readData(datastr);
+    if (todaystr==datastr){
+      html.push('<div content="'+content+'" data="'+datastr+'" class="day curday">');
+    }else{
+      html.push('<div content="'+content+'" data="'+datastr+'" class="day">');
+    }
+    html.push('<span class="day-num">');
+    html.push(monthData.days[i]);
+    html.push('</span>');
+    html.push('<pre class="day-content">');
+    html.push(content);
+    html.push('</pre>');
+    html.push('</div>');
+  }
+  document.getElementById('content').innerHTML=html.join('');
+  document.getElementById('title').innerHTML=monthData.year+'年'+monthData.cur+'月';
+  initViewListener();
+};
+var initViewListener=function(){
+  var days=document.getElementsByClassName('day');
+  var edit=document.getElementById('edit');
+  var text=document.getElementById('edit-content');
+  var title=document.getElementById('edit-title');
+  for (var i=0;i<days.length;i++){
+    var day=days[i];
+    day.onclick=function(){
+      var data=this.getAttribute('data');
+      var content=this.getAttribute('content');
+      //弹出编辑框，并纪录编辑内容
+      edit.style.display='block';
+      edit.setAttribute('data',data);
+      title.innerHTML=data;
+      text.value=content;
+    };
+  }
+};
+var initListener=function(){
+  var arrleft=document.getElementById('arr-l');
+  var arrright=document.getElementById('arr-r');
+  arrleft.onclick=function(){
+    var year=monthData.pre==12?monthData.year-1:monthData.year;
+    generalMonth(year,monthData.pre);
+    buildView();
+  };
+  arrright.onclick=function(){
+    var year=monthData.next==1?monthData.year+1:monthData.year;
+    generalMonth(year,monthData.next);
+    buildView();
+  };
+  var edit=document.getElementById('edit');
+  var cancle=document.getElementById('cancle');
+  var submit=document.getElementById('submit');
+  var text=document.getElementById('edit-content');
+  cancle.onclick=function(){
+    edit.style.display='none';
+    text.value='';
+  };
+  submit.onclick=function(){
+    edit.style.display='none';
+    var content=text.value;
+    var key=edit.getAttribute('data');
+    text.value='';
+    writeData(key,content);
+    buildView();
+  };
+
+};
+var writeData=function(key,value){
+  localStorage.setItem(key,value);
+};
+var readData=function(key){
+  var re=localStorage.getItem(key);
+  return re?re:'';
+};
+
+var init=function(){
+  var curdate=new Date();
+  var year=curdate.getFullYear();
+  var month=curdate.getMonth()+1;
+  todaystr=year+'-'+month+'-'+curdate.getDate();
+  generalMonth(year,month);
+  buildView();
+  initListener();
+};
+init();
+</script>
