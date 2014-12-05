@@ -11,7 +11,7 @@ color:#333;
 display:block;
 position:relative;
 margin:auto;
-width:800px;
+width:700px;
 height:100px;
 background:#ddd;
 line-height:100px;
@@ -21,20 +21,35 @@ font-size:20px;
 display:block;
 position:relative;
 margin:auto;
-width:800px;
+width:700px;
 height:600px;
 }
 .arr{
 display:block;
-position:relative;
-float:left;
-width:50px;
-height:600px;
-background:#aaa;
-line-height:600px;
+position:absolute;;
+top:0;
+width:200px;
+height:720px;
+background:#eee;
+opacity:0;
+line-height:700px;
+font-size:50px;
+}
+#arr-l{
+left:50%;
+margin-left:-550px;
+}
+#arr-r{
+right:50%;
+margin-right:-550px;
+}
+@-webkit-keyframes twinkle{
+  0%{opacity:0;}
+  50%{opacity:1;}
+  100%{opacity:0;}
 }
 .arr:hover{
-background:#999;
+ -webkit-animation:twinkle 1.5s infinite ease-in-out;
 }
 .pad{
 display:block;
@@ -64,6 +79,7 @@ width:100px;
 margin:0;
 padding:0;
 font-size:14px;
+overflow:hidden;
 }
 .weekday:nth-of-type(2n),.day:nth-of-type(2n-1){
 background:#eee;
@@ -74,7 +90,7 @@ background:#ccc;
 .weekday:nth-of-type(7n),.day:nth-of-type(7n){
 color:red;
 }
-.weekday:nth-of-type(7n+1),.day:nth-of-type(7n+1){
+.weekday:nth-of-type(7n-1),.day:nth-of-type(7n-1){
 color:red;
 }
 .week{
@@ -82,7 +98,7 @@ display:block;
 position:relative;
 margin:auto;
 text-align:center;
-width:800px;
+width:700px;
 height:20px;
 background:#ddd;
 }
@@ -93,12 +109,6 @@ margin:auto;
 float:left;
 width:100px;
 height:20px;
-}
-.weekday:first-child{
-margin-left:50px;
-}
-.weekday:last-child{
-margin-right:50px;
 }
 .curday{
 background:#0ff !important;
@@ -141,7 +151,8 @@ position:relative;
 float:left;
 padding:0;
 margin:0;
-border:none
+border:none;
+font-size:20px;
 }
 .edit button{
 display:block;
@@ -155,6 +166,7 @@ float:left;
 
 <div class="main">
 	<div class="header" id="title"></div>
+	<div class="arr" id="arr-l"><</div>
 	<div class="week">
 	  <span class="weekday">日</span>
 	  <span class="weekday">一</span>
@@ -165,10 +177,9 @@ float:left;
 	  <span class="weekday">六</span>
 	</div>
 	<div class="body">
-	  <div class="arr" id="arr-l"><</div>
 	  <div class="pad" id="content"></div>
-	  <div class="arr" id="arr-r">></div>
 	</div>
+	<div class="arr" id="arr-r">></div>
 </div>
 <div class="edit" id="edit">
   <div class="edit-box">
@@ -199,21 +210,24 @@ var generalMonth=function(year,month){
 	var firstweeknum=0;//0-6
 	var curfirstday=new Date(year,month-1,1);
 	firstweeknum=curfirstday.getDay();
+	firstweeknum=(firstweeknum+6)%7;
 	//生成days数据
 	var lastfirstday=new Date(year,month-2,1);
 	monthData.pre=lastfirstday.getMonth()+1;
 	var curdate=0;
 	for (var i=0;i<42;i++){
-	  if (i<firstweeknum||i>totalday){
+	  if (i<firstweeknum||i>=totalday){
 	    curdate=0;
 	  }else{
 	    curdate++;
 	  }
-	  monthData.days[i]=curdate;
+	  if (curdate!=0)
+	    monthData.days[i]=curdate;
+	  else
+	    monthData.days[i]='-';
 	}
 	monthData.cur=month;
 	monthData.year=year;
-	console.log(monthData);
 };
 var buildView=function(){
   var html=[];
@@ -221,9 +235,11 @@ var buildView=function(){
     var datastr=monthData.year+'-'+monthData.cur+'-'+monthData.days[i];
     var content=readData(datastr);
     if (todaystr==datastr){
-      html.push('<div content="'+content+'" data="'+datastr+'" class="day curday">');
+      html.push('<div title="'+content+'" data="'+datastr+'" class="day curday">');
+    }else if (monthData.days[i]=='-'){
+      html.push('<div title="-" data="'+datastr+'" class="day">');
     }else{
-      html.push('<div content="'+content+'" data="'+datastr+'" class="day">');
+      html.push('<div title="'+content+'" data="'+datastr+'" class="day">');
     }
     html.push('<span class="day-num">');
     html.push(monthData.days[i]);
@@ -246,12 +262,14 @@ var initViewListener=function(){
     var day=days[i];
     day.onclick=function(){
       var data=this.getAttribute('data');
-      var content=this.getAttribute('content');
+      var content=this.getAttribute('title');
+      if (content=='-')return;
       //弹出编辑框，并纪录编辑内容
       edit.style.display='block';
       edit.setAttribute('data',data);
       title.innerHTML=data;
       text.value=content;
+      text.focus();
     };
   }
 };
