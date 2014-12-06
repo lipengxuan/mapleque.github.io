@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <meta charset='utf8'>
+<title>台历</title>
 <style>
 html,body{
 margin:0;
@@ -118,6 +119,9 @@ height:20px;
 .curday{
 background:#0ff !important;
 }
+.otherday{
+color:#aaa!important;
+}
 
 .edit{
 display:none;
@@ -166,25 +170,24 @@ height:50px;
 position:relative;
 float:left;
 }
-
 </style>
 
 <div class="main">
-	<div class="header" id="title"></div>
-	<div class="arr" id="arr-l"><</div>
-	<div class="week">
-	  <span class="weekday">一</span>
-	  <span class="weekday">二</span>
-	  <span class="weekday">三</span>
-	  <span class="weekday">四</span>
-	  <span class="weekday">五</span>
-	  <span class="weekday">六</span>
-	  <span class="weekday">日</span>
-	</div>
-	<div class="body">
-	  <div class="pad" id="content"></div>
-	</div>
-	<div class="arr" id="arr-r">></div>
+  <div class="header" id="title"></div>
+  <div class="arr" id="arr-l"><</div>
+  <div class="week">
+    <span class="weekday">一</span>
+    <span class="weekday">二</span>
+    <span class="weekday">三</span>
+    <span class="weekday">四</span>
+    <span class="weekday">五</span>
+    <span class="weekday">六</span>
+    <span class="weekday">日</span>
+  </div>
+  <div class="body">
+    <div class="pad" id="content"></div>
+  </div>
+  <div class="arr" id="arr-r">></div>
 </div>
 <div class="edit" id="edit">
   <div class="edit-box">
@@ -200,7 +203,9 @@ var monthData={
 	pre:1,//上个月份
 	cur:2,//当前月分
 	next:3,//下个
-	days:[]//日期数组，长度固定为42
+	days:[],//日期数组，长度固定为42
+	keys:[],//key数组
+	tags:[]//显示标记数组
 };
 var todaystr='';
 //生成指定月份数据
@@ -209,7 +214,7 @@ var generalMonth=function(year,month){
 	var totalday=0;//1-31
 	var nextfirstday=new Date(year,month,1);
 	monthData.next=nextfirstday.getMonth()+1;
-	nextfirstday.setDate(nextfirstday.getDate()-1)
+	nextfirstday.setDate(0)
 	totalday=nextfirstday.getDate();
   //计算当前月第一天是星期几
 	var firstweeknum=0;//0-6
@@ -220,16 +225,25 @@ var generalMonth=function(year,month){
 	var lastfirstday=new Date(year,month-2,1);
 	monthData.pre=lastfirstday.getMonth()+1;
 	var curdate=0;
+	curfirstday.setDate(0);
+	var lasttotalday=curfirstday.getDate();
 	for (var i=0;i<42;i++){
-	  if (i<firstweeknum||i>=totalday){
-	    curdate=0;
+	  if (i<firstweeknum){
+	    monthData.days[i]=lasttotalday-firstweeknum+i+1;
+	    var tmpdate=new Date(year,month-1,0);
+	    monthData.keys[i]=tmpdate.getFullYear()+'-'+(tmpdate.getMonth()+1)+'-'+monthData.days[i];
+	    monthData.tags[i]=0;
+	  }else if (i>=totalday+firstweeknum){ 
+	    monthData.days[i]=1+i-totalday-firstweeknum;
+	    var tmpdate=new Date(year,month,1);
+	    monthData.keys[i]=tmpdate.getFullYear()+'-'+(tmpdate.getMonth()+1)+'-'+monthData.days[i];
+	    monthData.tags[i]=0;
 	  }else{
 	    curdate++;
-	  }
-	  if (curdate!=0)
 	    monthData.days[i]=curdate;
-	  else
-	    monthData.days[i]='-';
+	    monthData.keys[i]=year+'-'+month+'-'+monthData.days[i];
+	    monthData.tags[i]=1;
+	  }
 	}
 	monthData.cur=month;
 	monthData.year=year;
@@ -237,15 +251,16 @@ var generalMonth=function(year,month){
 var buildView=function(){
   var html=[];
   for (var i=0;i<42;i++){
-    var datastr=monthData.year+'-'+monthData.cur+'-'+monthData.days[i];
+    var datastr=monthData.keys[i];
     var content=readData(datastr);
+    var dayclass='day';
     if (todaystr==datastr){
-      html.push('<div title="'+content+'" data="'+datastr+'" class="day curday">');
-    }else if (monthData.days[i]=='-'){
-      html.push('<div title="-" data="'+datastr+'" class="day">');
-    }else{
-      html.push('<div title="'+content+'" data="'+datastr+'" class="day">');
+      dayclass+=' curday';
     }
+    if (monthData.tags[i]==0){
+      dayclass+=' otherday';
+    }
+    html.push('<div title="'+content+'" data="'+datastr+'" class="'+dayclass+'">');
     html.push('<span class="day-num">');
     html.push(monthData.days[i]);
     html.push('</span>');
