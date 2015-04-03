@@ -1,0 +1,48 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Using Backbone.js</title>
+<link rel="stylesheet" href="css/main.css">
+<script src="js/common/underscore.js"></script>
+<script src="js/common/jquery-1.11.2.js"></script>
+<script src="js/common/backbone.js"></script>
+<div id="list">
+  <button id="add">add</button>
+  <ul></ul>
+</div>
+<script>
+SimpleModel=Backbone.Model.extend({
+  name:null
+});
+SimpleCollection=Backbone.Collection.extend({
+  initialize:function(model,options){
+    this.bind('add',options.view.addOneModel);
+  }
+});
+SimpleView=Backbone.View.extend({
+  el:$('#list'),
+  initialize:function(){
+    //TODO new Collection API
+    this.simpleCollections=new SimpleCollection(null,{view:this});
+  },
+  events:{
+    //TODO api
+    'click #add':'addEvent'
+  },
+  addEvent:function(){
+    //TODO to add sth
+    var sth=prompt('input sth');
+    if (sth=='')return;
+
+    //opt collection with model
+    //TODO new Model API
+    simpleModel=new SimpleModel({name:sth});
+    //call collection method
+    this.simpleCollections.add(simpleModel);
+  },
+  addOneModel:function(model){
+    //TODO after add sth
+    $('#list ul').append('<li>'+model.get('name')+'</li>');
+  }
+});
+var simpleview=new SimpleView;
+</script>
